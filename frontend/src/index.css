@@ -1,0 +1,118 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --bg: #0b0c10;
+    --panel: #12131a;
+    --panel-2: #171a24;
+    --border: rgba(255, 255, 255, 0.08);
+
+    --text: rgba(255, 255, 255, 0.92);
+    --muted: rgba(255, 255, 255, 0.66);
+    --muted-2: rgba(255, 255, 255, 0.48);
+
+    --primary: #9b51e0;
+    --primary-2: #c084fc;
+    --danger: #ef4444;
+
+    font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial,
+      "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji";
+    text-rendering: geometricPrecision;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+
+  body {
+    margin: 0;
+    min-width: 320px;
+    background: radial-gradient(1000px 500px at 20% 0%, rgba(155, 81, 224, 0.18), transparent 55%),
+      radial-gradient(900px 500px at 80% 10%, rgba(96, 165, 250, 0.12), transparent 55%),
+      var(--bg);
+    color: var(--text);
+  }
+}
+
+@layer components {
+  .dc-card {
+    border: 1px solid var(--border);
+    border-radius: 1rem;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.02));
+    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.02);
+  }
+
+  .dc-input {
+    width: 100%;
+    border-radius: 0.875rem;
+    border: 1px solid var(--border);
+    padding: 0.75rem 1rem;
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+    outline: none;
+    transition: box-shadow 150ms ease, border-color 150ms ease, background-color 150ms ease;
+    background: rgba(255, 255, 255, 0.03);
+    color: var(--text);
+  }
+  .dc-input::placeholder {
+    color: var(--muted-2);
+  }
+  .dc-input:focus {
+    box-shadow: 0 0 0 3px rgba(155, 81, 224, 0.25);
+    border-color: rgba(155, 81, 224, 0.55);
+  }
+
+  .dc-btn-primary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0.875rem;
+    padding: 0.75rem 1rem;
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+    font-weight: 650;
+    transition: filter 150ms ease, transform 150ms ease, background-color 150ms ease;
+    background: linear-gradient(135deg, var(--primary), var(--primary-2));
+    color: white;
+  }
+  .dc-btn-primary:hover {
+    filter: brightness(1.05);
+  }
+
+  .dc-btn-secondary {
+    border: 1px solid var(--border);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0.875rem;
+    padding: 0.75rem 1rem;
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+    font-weight: 650;
+    transition: background-color 150ms ease, border-color 150ms ease, color 150ms ease;
+    background: rgba(255, 255, 255, 0.03);
+    color: var(--text);
+  }
+  .dc-btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.06);
+  }
+
+  .dc-select {
+    width: 100%;
+    border-radius: 0.875rem;
+    border: 1px solid var(--border);
+    padding: 0.75rem 1rem;
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+    outline: none;
+    transition: box-shadow 150ms ease, border-color 150ms ease, background-color 150ms ease;
+    background: rgba(255, 255, 255, 0.03);
+    color: var(--text);
+  }
+}

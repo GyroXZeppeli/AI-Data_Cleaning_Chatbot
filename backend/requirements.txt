@@ -1,0 +1,10 @@
+fastapi
+uvicorn[standard]
+sqlalchemy
+pydantic
+python-jose
+passlib
+# passlib 1.7.4 expects bcrypt to expose bcrypt.__about__.__version__
+bcrypt<4
+plotly
+
