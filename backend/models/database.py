@@ -1,13 +1,14 @@
+import os
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, declarative_base
 
-# Make sure you create a database named 'ai_data_cleaning' in your local MySQL instance
-# Replace 'root' and 'password' with your actual MySQL credentials if necessary.
-SQLALCHEMY_DATABASE_URL = "sqlite:///./ai_data_cleaning.db"
+SQLALCHEMY_DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./ai_data_cleaning.db")
+engine_kwargs = {}
 
-engine = create_engine(
-    SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False}
-)
+if SQLALCHEMY_DATABASE_URL.startswith("sqlite"):
+    engine_kwargs["connect_args"] = {"check_same_thread": False}
+
+engine = create_engine(SQLALCHEMY_DATABASE_URL, **engine_kwargs)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 Base = declarative_base()

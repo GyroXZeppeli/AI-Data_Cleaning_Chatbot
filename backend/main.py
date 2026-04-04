@@ -1,8 +1,11 @@
+from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from routes import auth, datasets, cleaning, ai_agent, insights, download, history as history_router
 from models import user, dataset, history
 from models.database import engine
+
+load_dotenv()
 
 # Create the database tables
 user.Base.metadata.create_all(bind=engine)
