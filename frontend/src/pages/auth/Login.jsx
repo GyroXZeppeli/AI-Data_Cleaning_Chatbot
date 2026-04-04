@@ -27,9 +27,9 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen px-4 py-10">
-      <div className="mx-auto max-w-5xl grid items-stretch gap-6 lg:grid-cols-2">
-        <div className="hidden lg:flex dc-card p-10 overflow-hidden relative">
+    <div className="dc-auth-shell">
+      <div className="dc-auth-grid">
+        <div className="dc-card dc-auth-panel hidden p-10 lg:flex">
           <div className="relative z-10">
             <div className="flex items-center gap-3">
               <div
@@ -61,18 +61,9 @@ export default function Login() {
               </div>
             </div>
           </div>
-
-          <div
-            className="absolute -right-24 -top-24 h-72 w-72 rounded-full blur-3xl opacity-70"
-            style={{ background: 'radial-gradient(circle at 30% 30%, rgba(192,132,252,0.45), transparent 60%)' }}
-          />
-          <div
-            className="absolute -left-28 -bottom-28 h-72 w-72 rounded-full blur-3xl opacity-60"
-            style={{ background: 'radial-gradient(circle at 30% 30%, rgba(96,165,250,0.35), transparent 60%)' }}
-          />
         </div>
 
-        <div className="dc-card p-8 sm:p-10">
+        <div className="dc-card p-6 sm:p-8 lg:p-10">
           <div>
             <h2 className="text-3xl font-semibold tracking-tight text-[color:var(--text)]">Welcome back</h2>
             <p className="mt-2 text-sm text-[color:var(--muted)]">Sign in to continue to your dashboard.</p>
