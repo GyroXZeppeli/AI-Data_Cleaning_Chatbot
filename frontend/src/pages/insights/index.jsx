@@ -32,13 +32,16 @@ export default function InsightsPage() {
 
   return (
     <DashboardLayout>
-      <div className="max-w-5xl mx-auto space-y-6">
-        <h1 className="text-3xl font-semibold tracking-tight text-[color:var(--text)] mb-6 flex items-center">
-            <PieChart className="w-8 h-8 mr-3 text-[color:var(--primary-2)]" />
-            Data Insights
-        </h1>
+      <div className="dc-page">
+        <div className="dc-page-header">
+          <div>
+            <div className="dc-page-kicker">Insights</div>
+            <h1 className="dc-page-title">Data insights</h1>
+            <p className="dc-page-copy">Generate a compact executive summary and baseline stats from any uploaded dataset. The inputs and output panels now stack more predictably across breakpoints.</p>
+          </div>
+        </div>
 
-        <div className="dc-card p-6 flex flex-col md:flex-row md:items-end gap-4">
+        <div className="dc-card flex flex-col gap-4 p-6 md:flex-row md:items-end">
             <div className="flex-1">
                  <label className="block text-sm font-medium text-[color:var(--muted)] mb-2">Dataset ID</label>
                  <input 
@@ -52,7 +55,7 @@ export default function InsightsPage() {
             <button
                 onClick={fetchInsights}
                 disabled={loading || !datasetId}
-                className="dc-btn-primary px-6 py-3 disabled:opacity-50 flex items-center"
+                className="dc-btn-primary disabled:opacity-50 flex items-center"
             >
                 {loading ? <Loader2 className="w-5 h-5 animate-spin mr-2" /> : 'Generate Insights'}
             </button>

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import DashboardLayout from '../../components/layout/DashboardLayout';
-import { Database, Wand2, Trash2, Edit3, Settings, AlertCircle } from 'lucide-react';
+import { AlertCircle, Edit3, Settings, Trash2, Wand2 } from 'lucide-react';
 import api from '../../api/axios';
 
 export default function ManualCleaning() {
@@ -43,35 +43,35 @@ export default function ManualCleaning() {
 
   return (
     <DashboardLayout>
-      <div className="max-w-5xl mx-auto space-y-6">
-        <div className="flex items-center justify-between">
-            <h1 className="text-3xl font-semibold tracking-tight text-[color:var(--text)] flex items-center">
-                <Wand2 className="w-8 h-8 mr-3 text-[color:var(--primary-2)]" />
-                Manual Cleaning
-            </h1>
+      <div className="dc-page">
+        <div className="dc-page-header">
+          <div>
+            <div className="dc-page-kicker">Cleaning</div>
+            <h1 className="dc-page-title">Manual cleaning controls</h1>
+            <p className="dc-page-copy">Use the dataset ID from your upload step, then apply targeted operations without leaving the workspace. Controls now stack cleanly on small screens and keep related actions grouped on larger ones.</p>
+          </div>
         </div>
 
-        {/* Dataset Selection Mockup */}
-        <div className="dc-card p-6">
-            <label className="block text-sm font-medium text-[color:var(--muted)] mb-2">Target Dataset ID</label>
+        <div className="dc-card p-6 sm:p-7">
+            <label className="block text-sm font-medium text-[color:var(--muted)] mb-2">Target dataset ID</label>
             <input 
                 type="number"
                 value={datasetId}
                 onChange={(e) => setDatasetId(e.target.value)}
                 placeholder="Enter Dataset ID (e.g. 1)"
-                className="dc-input md:w-64"
+                className="dc-input w-full sm:max-w-xs"
             />
         </div>
 
         {error && (
-            <div className="p-4 rounded-xl flex items-center" style={{ backgroundColor: 'rgba(239, 68, 68, 0.12)', border: '1px solid rgba(239, 68, 68, 0.25)', color: 'var(--danger)' }}>
+            <div className="rounded-2xl p-4 flex items-center" style={{ backgroundColor: 'rgba(239, 68, 68, 0.12)', border: '1px solid rgba(239, 68, 68, 0.25)', color: 'var(--danger)' }}>
                 <AlertCircle className="w-5 h-5 mr-2" />
                 {error}
             </div>
         )}
 
         {operationResult && (
-            <div className="p-4 bg-green-500/10 border border-green-500/50 rounded-lg flex flex-col text-green-400">
+            <div className="rounded-2xl border border-emerald-500/40 bg-emerald-500/10 p-4 text-emerald-300">
                 <span className="font-semibold">{operationResult.message}</span>
                 {operationResult.new_stats && (
                     <span className="text-sm mt-1 opacity-80">
@@ -81,13 +81,15 @@ export default function ManualCleaning() {
             </div>
         )}
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 text-sm">
+        <div className="grid gap-6 xl:grid-cols-[minmax(260px,0.8fr)_minmax(0,1.2fr)] text-sm">
             
-            {/* Quick Actions */}
             <div className="dc-card p-6 space-y-4">
                 <div className="flex items-center text-[color:var(--text)] font-semibold text-lg mb-2">
                     <Settings className="w-5 h-5 mr-2 text-[color:var(--muted-2)]" /> General Operations
                 </div>
+                <p className="text-[color:var(--muted)] leading-6">
+                  Use these for broad cleanup passes before you target a specific column.
+                </p>
                 <button 
                     onClick={() => executeOperation('drop_duplicates')}
                     disabled={loading}
@@ -106,8 +108,7 @@ export default function ManualCleaning() {
                 </button>
             </div>
 
-            {/* Column Operations */}
-            <div className="dc-card p-6 space-y-4 lg:col-span-2">
+            <div className="dc-card p-6 space-y-4">
                 <div className="flex items-center text-[color:var(--text)] font-semibold text-lg mb-4">
                     <Edit3 className="w-5 h-5 mr-2 text-[color:var(--muted-2)]" /> Column Operations
                 </div>
@@ -124,7 +125,7 @@ export default function ManualCleaning() {
                         />
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t" style={{ borderColor: 'var(--border)' }}>
+                    <div className="grid grid-cols-1 gap-4 border-t pt-4 lg:grid-cols-2" style={{ borderColor: 'var(--border)' }}>
                          <div className="space-y-2">
                             <label className="block text-xs text-[color:var(--muted)]">Fill Method</label>
                             <select 
@@ -161,7 +162,7 @@ export default function ManualCleaning() {
                             <button 
                                 onClick={() => executeOperation('drop_column', { column: selectedColumn })}
                                 disabled={loading || !selectedColumn}
-                                className="w-full py-2 rounded-xl transition-colors border disabled:opacity-50"
+                                className="w-full rounded-xl border py-2 transition-colors disabled:opacity-50"
                                 style={{
                                   backgroundColor: 'rgba(239, 68, 68, 0.12)',
                                   borderColor: 'rgba(239, 68, 68, 0.25)',

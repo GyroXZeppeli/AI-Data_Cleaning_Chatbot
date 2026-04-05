@@ -24,11 +24,14 @@ export default function History() {
 
   return (
     <DashboardLayout>
-      <div className="max-w-4xl mx-auto space-y-6">
-        <h1 className="text-3xl font-semibold tracking-tight text-[color:var(--text)] mb-6 flex items-center">
-            <Clock className="w-8 h-8 mr-3 text-[color:var(--primary-2)]" />
-            Activity History
-        </h1>
+      <div className="dc-page">
+        <div className="dc-page-header">
+          <div>
+            <div className="dc-page-kicker">History</div>
+            <h1 className="dc-page-title">Activity history</h1>
+            <p className="dc-page-copy">Review recent dataset actions in a layout that keeps table content scrollable on smaller screens without collapsing readability.</p>
+          </div>
+        </div>
         
         <div className="dc-card overflow-hidden">
           {error && (
@@ -46,7 +49,8 @@ export default function History() {
                 <p className="text-[color:var(--muted)]">Upload a dataset and start cleaning to see your history here.</p>
              </div>
           ) : (
-             <table className="min-w-full" style={{ borderTop: '1px solid var(--border)' }}>
+             <div className="overflow-x-auto">
+             <table className="min-w-[720px] w-full" style={{ borderTop: '1px solid var(--border)' }}>
                 <thead style={{ backgroundColor: 'rgba(255,255,255,0.03)' }}>
                     <tr>
                         <th scope="col" className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-[color:var(--muted-2)]">Date</th>
@@ -70,6 +74,7 @@ export default function History() {
                     ))}
                 </tbody>
              </table>
+             </div>
           )}
         </div>
       </div>

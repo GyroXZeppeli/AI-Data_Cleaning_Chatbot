@@ -51,22 +51,21 @@ export default function Chatbot() {
 
   return (
     <div
-      className="flex flex-col h-full rounded-3xl overflow-hidden shadow-2xl relative w-full"
-      style={{ border: '1px solid var(--border)', backgroundColor: 'rgba(10, 10, 16, 0.55)' }}
+      className="relative flex h-full w-full flex-col overflow-hidden rounded-[1.75rem] shadow-2xl"
+      style={{ border: '1px solid var(--border)', backgroundColor: 'rgba(8, 18, 34, 0.68)' }}
     >
-      {/* Header matching the Dark UI template */}
-      <div className="flex items-center justify-between px-5 sm:px-6 py-4 z-10 border-b" style={{ borderColor: 'var(--border)' }}>
+      <div className="z-10 flex items-center justify-between gap-3 border-b px-4 py-4 sm:px-6" style={{ borderColor: 'var(--border)' }}>
         <Link to="/" className="text-[color:var(--muted)] hover:text-[color:var(--text)] transition-colors">
           <ChevronLeft className="w-6 h-6" />
         </Link>
-        <div className="flex flex-col items-center">
-             <span className="text-[color:var(--text)] font-semibold text-lg tracking-tight">AI Assistant</span>
+        <div className="flex min-w-0 flex-1 flex-col items-center">
+             <span className="text-[color:var(--text)] font-semibold text-base sm:text-lg tracking-tight">AI Assistant</span>
              <input
                 type="number"
                 placeholder="Dataset ID"
                 value={datasetId}
                 onChange={(e) => setDatasetId(e.target.value)}
-                className="bg-transparent border-b text-center text-xs focus:outline-none w-24 transition-colors"
+                className="w-24 border-b bg-transparent text-center text-xs focus:outline-none transition-colors"
                 style={{ borderColor: 'rgba(255,255,255,0.18)', color: 'var(--muted)' }}
              />
         </div>
@@ -75,7 +74,6 @@ export default function Chatbot() {
         </button>
       </div>
 
-      {/* Chat Messages Area */}
       <div className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-5">
         {messages.map((msg, index) => (
           <div
@@ -87,7 +85,7 @@ export default function Chatbot() {
           >
             <div
               className={clsx(
-                'max-w-[85%] rounded-2xl px-4 py-3 text-[15px] leading-relaxed relative',
+                'relative max-w-[92%] rounded-2xl px-4 py-3 text-[15px] leading-relaxed sm:max-w-[85%]',
                 msg.role === 'user'
                   ? 'text-[color:var(--text)] rounded-tr-sm'
                   : 'text-white rounded-tl-sm'
@@ -133,11 +131,10 @@ export default function Chatbot() {
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Input Area */}
       <div className="p-4 sm:p-5 relative">
         <form
           onSubmit={handleSubmit}
-          className="flex items-center space-x-2 rounded-full px-2 py-2"
+          className="flex items-center space-x-2 rounded-[1.25rem] px-2 py-2"
           style={{ border: '1px solid var(--border)', backgroundColor: 'rgba(255,255,255,0.05)' }}
         >
           <input

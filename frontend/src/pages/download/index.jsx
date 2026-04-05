@@ -49,13 +49,19 @@ export default function DownloadData() {
 
   return (
     <DashboardLayout>
-      <div className="max-w-3xl mx-auto space-y-6">
-        <h1 className="text-3xl font-semibold tracking-tight text-[color:var(--text)] mb-6">Extract Data</h1>
+      <div className="dc-page">
+        <div className="dc-page-header">
+          <div>
+            <div className="dc-page-kicker">Export</div>
+            <h1 className="dc-page-title">Extract data</h1>
+            <p className="dc-page-copy">Download a cleaned dataset as CSV, Excel, or JSON. The form now fits comfortably on both narrow and wide screens.</p>
+          </div>
+        </div>
         
-        <div className="dc-card p-8">
+        <div className="dc-card p-6 sm:p-8">
           <p className="text-[color:var(--muted)] mb-6">Download your cleaned dataset in your preferred format.</p>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 mb-6">
             <div>
                  <label className="block text-sm font-medium text-[color:var(--muted)] mb-2">Dataset ID</label>
                  <input 
@@ -89,7 +95,7 @@ export default function DownloadData() {
           <button
              onClick={handleDownload}
              disabled={loading || !datasetId}
-             className="w-full md:w-auto dc-btn-primary px-6 py-3 disabled:opacity-50 flex items-center justify-center"
+             className="w-full md:w-auto dc-btn-primary disabled:opacity-50 flex items-center justify-center"
           >
              <Download className="w-5 h-5 mr-2" />
              {loading ? 'Preparing Download...' : 'Download Cleaned Data'}
