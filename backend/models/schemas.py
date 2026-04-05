@@ -1,4 +1,5 @@
 from pydantic import BaseModel, ConfigDict, EmailStr
+from typing import Optional, Dict, Any
 
 class UserCreate(BaseModel):
     name: str
@@ -20,7 +21,21 @@ class UserOut(BaseModel):
 
     model_config = ConfigDict(from_attributes=True)
 
-from typing import Optional, Dict, Any
+class AIConfig(BaseModel):
+    provider: str = "openrouter"
+    model: str
+    api_key: Optional[str] = None
+    base_url: Optional[str] = None
+
+class DatasetOut(BaseModel):
+    dataset_id: int
+    file_name: str
+    file_path: str
+    rows: int
+    columns: int
+    upload_time: Any
+
+    model_config = ConfigDict(from_attributes=True)
 
 class CleanOperation(BaseModel):
     dataset_id: int

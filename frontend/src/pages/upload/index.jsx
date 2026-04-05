@@ -1,9 +1,11 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import DashboardLayout from '../../components/layout/DashboardLayout';
 import { AlertCircle, File, UploadCloud } from 'lucide-react';
 import api from '../../api/axios';
 
 export default function UploadDataset() {
+  const navigate = useNavigate();
   const [file, setFile] = useState(null);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState('');
@@ -49,7 +51,11 @@ export default function UploadDataset() {
         }
       });
       alert(`Upload successful! Detected ${response.data.analysis.summary.rows} rows and ${response.data.analysis.summary.columns} columns.`);
-      // TODO: Redirect to analysis view or save state
+      navigate('/', {
+        state: {
+          uploadedDatasetId: response.data.dataset_id,
+        },
+      });
     } catch (err) {
       setError(err.response?.data?.detail || 'An error occurred during upload.');
     } finally {

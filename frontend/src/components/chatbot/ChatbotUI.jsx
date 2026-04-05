@@ -1,9 +1,72 @@
 import { useState, useRef, useEffect } from 'react';
-import { Send, ChevronLeft, MoreVertical, Bot } from 'lucide-react';
+import { Send, ChevronLeft, MoreVertical, Bot, KeyRound, Save } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import clsx from 'clsx';
 import api from '../../api/axios';
 import { getErrorMessage } from '../../utils/getErrorMessage';
+
+const AI_SETTINGS_KEY = 'ai_settings';
+const DEFAULT_SETTINGS = {
+  provider: 'openrouter',
+  model: 'openai/gpt-4o-mini',
+  api_key: '',
+  base_url: 'https://openrouter.ai/api/v1/chat/completions',
+};
+
+function parseStructuredAssistantResponse(content) {
+  if (typeof content !== 'string') return null;
+
+  try {
+    const parsed = JSON.parse(content);
+    if (!parsed || !Array.isArray(parsed.actions)) return null;
+    return parsed;
+  } catch {
+    return null;
+  }
+}
+
+function describeFillValue(value) {
+  if (value === 'mean' || value === 'median' || value === 'mode') return `using ${value}`;
+  if (value === '') return 'with an empty string';
+  return `with "${String(value)}"`;
+}
+
+function buildAssistantMessage(content) {
+  const plan = parseStructuredAssistantResponse(content);
+  if (!plan) {
+    return { role: 'ai', content };
+  }
+
+  const steps = plan.actions.map((action, index) => {
+    if (action.action === 'drop_duplicates') {
+      return {
+        title: `Step ${index + 1}: Remove duplicate rows`,
+        detail: 'This will remove repeated records from the dataset.',
+      };
+    }
+
+    if (action.action === 'fill_missing' && action.columns && typeof action.columns === 'object') {
+      const entries = Object.entries(action.columns);
+      return {
+        title: `Step ${index + 1}: Fill missing values`,
+        detail: `${entries.length} column rules suggested.`,
+        items: entries.map(([column, value]) => `${column}: fill ${describeFillValue(value)}`),
+      };
+    }
+
+    return {
+      title: `Step ${index + 1}: ${action.action}`,
+      detail: 'AI returned a structured cleaning action for this step.',
+    };
+  });
+
+  return {
+    role: 'ai',
+    content: `I found a ${steps.length}-step cleaning plan for this dataset. Review the suggested actions below and tell me what you want to do next.`,
+    plan: steps,
+    raw: content,
+  };
+}
 
 export default function Chatbot() {
   const [messages, setMessages] = useState([
@@ -15,6 +78,8 @@ export default function Chatbot() {
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef(null);
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [settingsSaved, setSettingsSaved] = useState(false);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -25,6 +90,30 @@ export default function Chatbot() {
   }, [messages, isLoading]);
 
   const [datasetId, setDatasetId] = useState('');
+  const [aiSettings, setAiSettings] = useState(() => {
+    const raw = localStorage.getItem(AI_SETTINGS_KEY);
+    if (!raw) return DEFAULT_SETTINGS;
+    try {
+      return { ...DEFAULT_SETTINGS, ...JSON.parse(raw) };
+    } catch {
+      return DEFAULT_SETTINGS;
+    }
+  });
+
+  useEffect(() => {
+    if (!settingsSaved) return;
+    const timeoutId = window.setTimeout(() => setSettingsSaved(false), 1800);
+    return () => window.clearTimeout(timeoutId);
+  }, [settingsSaved]);
+
+  const handleSettingsChange = (field, value) => {
+    setAiSettings((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const saveSettings = () => {
+    localStorage.setItem(AI_SETTINGS_KEY, JSON.stringify(aiSettings));
+    setSettingsSaved(true);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -33,6 +122,14 @@ export default function Chatbot() {
         setMessages(prev => [...prev, { role: 'ai', content: 'Please provide a Dataset ID in the input field above first to query your data.' }]);
         return;
     }
+    if (!aiSettings.model.trim()) {
+      setMessages(prev => [...prev, { role: 'ai', content: 'Please set a model in AI settings before sending a chat request.' }]);
+      return;
+    }
+    if (!aiSettings.api_key.trim()) {
+      setMessages(prev => [...prev, { role: 'ai', content: 'Please add an API key in AI settings before sending a chat request.' }]);
+      return;
+    }
 
     const userMsg = input.trim();
     setInput('');
@@ -40,8 +137,12 @@ export default function Chatbot() {
     setIsLoading(true);
 
     try {
-      const response = await api.post('/ai/chat', { dataset_id: parseInt(datasetId), user_message: userMsg });
-      setMessages(prev => [...prev, { role: 'ai', content: response.data.ai_response }]);
+      const response = await api.post('/ai/chat', {
+        dataset_id: parseInt(datasetId),
+        user_message: userMsg,
+        ai_config: aiSettings,
+      });
+      setMessages(prev => [...prev, buildAssistantMessage(response.data.ai_response)]);
     } catch (err) {
       setMessages(prev => [...prev, { role: 'ai', content: getErrorMessage(err) }]);
     } finally {
@@ -69,10 +170,75 @@ export default function Chatbot() {
                 style={{ borderColor: 'rgba(255,255,255,0.18)', color: 'var(--muted)' }}
              />
         </div>
-        <button className="text-[color:var(--muted)] hover:text-[color:var(--text)] transition-colors" type="button">
+        <button
+          className="text-[color:var(--muted)] hover:text-[color:var(--text)] transition-colors"
+          type="button"
+          onClick={() => setSettingsOpen((prev) => !prev)}
+        >
           <MoreVertical className="w-6 h-6" />
         </button>
       </div>
+
+      {settingsOpen && (
+        <div className="border-b px-4 py-4 sm:px-6" style={{ borderColor: 'var(--border)', backgroundColor: 'rgba(255,255,255,0.03)' }}>
+          <div className="flex items-center gap-2 text-sm font-semibold text-[color:var(--text)]">
+            <KeyRound className="h-4 w-4 text-[color:var(--primary-2)]" />
+            AI settings
+          </div>
+          <div className="mt-4 grid gap-4 md:grid-cols-2">
+            <label className="text-xs text-[color:var(--muted)]">
+              Provider
+              <select
+                value={aiSettings.provider}
+                onChange={(e) => handleSettingsChange('provider', e.target.value)}
+                className="dc-select mt-1 px-3 py-2"
+              >
+                <option value="openrouter">OpenRouter</option>
+                <option value="gemini">Gemini</option>
+              </select>
+            </label>
+            <label className="text-xs text-[color:var(--muted)]">
+              Model
+              <input
+                type="text"
+                value={aiSettings.model}
+                onChange={(e) => handleSettingsChange('model', e.target.value)}
+                placeholder={aiSettings.provider === 'openrouter' ? 'openai/gpt-4o-mini' : 'gemini-2.5-flash'}
+                className="dc-input mt-1 px-3 py-2"
+              />
+            </label>
+            <label className="text-xs text-[color:var(--muted)] md:col-span-2">
+              API key
+              <input
+                type="password"
+                value={aiSettings.api_key}
+                onChange={(e) => handleSettingsChange('api_key', e.target.value)}
+                placeholder={aiSettings.provider === 'openrouter' ? 'sk-or-v1-...' : 'AIza...'}
+                className="dc-input mt-1 px-3 py-2"
+              />
+            </label>
+            <label className="text-xs text-[color:var(--muted)] md:col-span-2">
+              Base URL
+              <input
+                type="text"
+                value={aiSettings.base_url}
+                onChange={(e) => handleSettingsChange('base_url', e.target.value)}
+                placeholder="https://openrouter.ai/api/v1/chat/completions"
+                className="dc-input mt-1 px-3 py-2"
+              />
+            </label>
+          </div>
+          <div className="mt-4 flex items-center justify-between gap-3">
+            <p className="text-xs leading-5 text-[color:var(--muted)]">
+              Settings are stored in your browser and sent only with AI requests.
+            </p>
+            <button type="button" onClick={saveSettings} className="dc-btn-primary">
+              <Save className="mr-2 h-4 w-4" />
+              {settingsSaved ? 'Saved' : 'Save settings'}
+            </button>
+          </div>
+        </div>
+      )}
 
       <div className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-5">
         {messages.map((msg, index) => (
@@ -113,6 +279,34 @@ export default function Chatbot() {
               <div className={clsx("whitespace-pre-wrap", msg.role === 'ai' && "pl-3")}>
                   {msg.content}
               </div>
+
+              {msg.role === 'ai' && Array.isArray(msg.plan) && msg.plan.length > 0 && (
+                <div className="mt-4 space-y-3 pl-3">
+                  {msg.plan.map((step) => (
+                    <div
+                      key={step.title}
+                      className="rounded-2xl border p-3 text-sm"
+                      style={{ borderColor: 'rgba(255,255,255,0.18)', backgroundColor: 'rgba(255,255,255,0.08)' }}
+                    >
+                      <div className="font-semibold text-white">{step.title}</div>
+                      <div className="mt-1 text-white/80">{step.detail}</div>
+                      {Array.isArray(step.items) && step.items.length > 0 && (
+                        <div className="mt-2 space-y-1 text-white/75">
+                          {step.items.map((item) => (
+                            <div key={item}>• {item}</div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                  <details className="text-xs text-white/70">
+                    <summary className="cursor-pointer select-none">Show raw plan</summary>
+                    <pre className="mt-2 overflow-x-auto whitespace-pre-wrap rounded-xl border p-3" style={{ borderColor: 'rgba(255,255,255,0.14)', backgroundColor: 'rgba(0,0,0,0.18)' }}>
+                      {msg.raw}
+                    </pre>
+                  </details>
+                </div>
+              )}
             </div>
           </div>
         ))}

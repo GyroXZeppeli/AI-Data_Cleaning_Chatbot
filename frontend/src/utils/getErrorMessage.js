@@ -1,9 +1,10 @@
 const DEFAULT_MESSAGE = 'Something went wrong. Please try again.';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
 
 export function getErrorMessage(error) {
   // Axios-style network error (no response received)
   if (error && !error.response && (error.code === 'ERR_NETWORK' || error.message === 'Network Error' || error.request)) {
-    return 'Cannot reach the server at http://localhost:8000. Make sure the backend is running, then try again.';
+    return `Cannot reach the server at ${API_BASE_URL}. Make sure the backend is running, then try again.`;
   }
 
   const detail =
@@ -25,4 +26,3 @@ export function getErrorMessage(error) {
 
   return DEFAULT_MESSAGE;
 }
-

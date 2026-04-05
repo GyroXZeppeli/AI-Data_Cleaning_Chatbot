@@ -12,7 +12,7 @@ from services.analysis_engine import analyze_dataset
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
 from services.auth import SECRET_KEY, ALGORITHM
-from models.schemas import UserOut
+from models.schemas import DatasetOut
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login")
 
@@ -30,6 +30,19 @@ router = APIRouter(prefix="/datasets", tags=["datasets"])
 
 UPLOAD_DIR = "datasets/uploads"
 os.makedirs(UPLOAD_DIR, exist_ok=True)
+
+@router.get("/", response_model=list[DatasetOut])
+def list_datasets(
+    db: Session = Depends(get_db),
+    user_id: int = Depends(get_current_user_id)
+):
+    datasets = (
+        db.query(Dataset)
+        .filter(Dataset.user_id == user_id)
+        .order_by(Dataset.upload_time.desc())
+        .all()
+    )
+    return datasets
 
 @router.post("/upload")
 async def upload_dataset(
