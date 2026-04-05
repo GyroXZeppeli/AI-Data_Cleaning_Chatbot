@@ -1,0 +1,24 @@
+customer_id,customer_name,city,age,monthly_spend,signup_channel,satisfaction_score,notes
+1001,Aarav Mehta,Mumbai,29,320,web,4.5,repeat customer
+1002,Diya Sharma,Delhi,34,410,referral,4.2,
+1003,Rohan Iyer,Bengaluru,,385,web,3.8,missing age
+1004,Sana Khan,Hyderabad,27,,instagram,4.1,missing spend
+1005,Vikram Singh,Pune,41,460,web,,missing satisfaction
+1006,Neha Gupta,Chennai,31,390,,4.0,missing channel
+1007,Arjun Nair,Kochi,26,340,referral,4.6,
+1008,Meera Joshi,Jaipur,38,25000,web,4.9,possible outlier
+1009,Kabir Patel,Ahmedabad,33,415,linkedin,3.9,
+1010,Isha Verma,Kolkata,30,405,web,4.3,
+1010,Isha Verma,Kolkata,30,405,web,4.3,duplicate row
+1011,Ritu Malhotra,Delhi,45,520,email,4.7,
+1012,Dev Rao,Bengaluru,28,360,web,3.7,
+1013,Ananya Das,,24,295,instagram,4.0,missing city
+1014,Karan Bedi,Mumbai,36,440,referral,2.1,
+1015,Priya Nair,Chennai,32,398,web,4.4,
+1010,Isha Verma,Kolkata,30,405,web,4.3,
+1010,Isha Verma,Kolkata,30,405,web,4.3,duplicate row
+1011,Ritu Malhotra,Delhi,45,520,email,4.7,
+1012,Dev Rao,Bengaluru,28,360,web,3.7,
+1013,Ananya Das,,24,295,instagram,4.0,missing city
+1014,Karan Bedi,Mumbai,36,440,referral,2.1,
+1015,Priya Nair,Chennai,32,398,web,4.4,

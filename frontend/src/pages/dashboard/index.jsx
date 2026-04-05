@@ -1,12 +1,8 @@
+import { useEffect, useState } from 'react';
 import DashboardLayout from '../../components/layout/DashboardLayout';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { ArrowRight, Bot, Download, PieChart, Sparkles, Upload, Wand2 } from 'lucide-react';
-
-const metrics = [
-  { label: 'Datasets tracked', value: '0', note: 'Ready for your first upload' },
-  { label: 'Cleaning actions', value: '0', note: 'Manual and AI changes' },
-  { label: 'Insight requests', value: '0', note: 'Summaries and charts' },
-];
+import api from '../../api/axios';
 
 const nextSteps = [
   { to: '/upload', icon: Upload, title: 'Upload a dataset', copy: 'Start with a CSV or Excel file and generate a quick profile.' },
@@ -16,6 +12,49 @@ const nextSteps = [
 ];
 
 export default function DashboardHome() {
+  const location = useLocation();
+  const [datasets, setDatasets] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    let ignore = false;
+
+    async function loadDatasets() {
+      try {
+        setLoading(true);
+        const response = await api.get('/datasets/');
+        if (!ignore) {
+          setDatasets(response.data);
+          setError('');
+        }
+      } catch (err) {
+        if (!ignore) {
+          setError(err.response?.data?.detail || 'Unable to load datasets.');
+        }
+      } finally {
+        if (!ignore) {
+          setLoading(false);
+        }
+      }
+    }
+
+    loadDatasets();
+    return () => {
+      ignore = true;
+    };
+  }, [location.state?.uploadedDatasetId]);
+
+  const metrics = [
+    {
+      label: 'Datasets tracked',
+      value: String(datasets.length),
+      note: datasets.length ? 'Available in your workspace' : 'Ready for your first upload',
+    },
+    { label: 'Cleaning actions', value: '0', note: 'Manual and AI changes' },
+    { label: 'Insight requests', value: '0', note: 'Summaries and charts' },
+  ];
+
   return (
     <DashboardLayout>
       <div className="dc-page">
@@ -80,14 +119,48 @@ export default function DashboardHome() {
           </div>
 
           <div className="dc-card p-6 sm:p-7">
-            <div className="dc-page-kicker">Activity</div>
-            <h2 className="text-2xl font-bold tracking-[-0.04em]">Recent workspace status</h2>
-            <div className="mt-6 rounded-[1.4rem] border border-dashed px-6 py-14 text-center" style={{ borderColor: 'rgba(148, 163, 184, 0.24)' }}>
-              <div className="text-sm uppercase tracking-[0.18em] text-[color:var(--muted-2)]">No recent activity</div>
-              <p className="mx-auto mt-3 max-w-sm text-sm leading-6 text-[color:var(--muted)]">
-                Start by uploading a dataset. Once you run cleaning or insight actions, this area becomes a quick project pulse.
-              </p>
+            <div className="dc-page-header">
+              <div>
+                <div className="dc-page-kicker">Activity</div>
+                <h2 className="text-2xl font-bold tracking-[-0.04em]">Recent workspace status</h2>
+              </div>
             </div>
+            {loading ? (
+              <div className="mt-6 rounded-[1.4rem] border border-dashed px-6 py-14 text-center" style={{ borderColor: 'rgba(148, 163, 184, 0.24)' }}>
+                <div className="text-sm uppercase tracking-[0.18em] text-[color:var(--muted-2)]">Loading datasets</div>
+              </div>
+            ) : error ? (
+              <div className="mt-6 rounded-[1.4rem] border px-6 py-6 text-sm" style={{ borderColor: 'rgba(239, 68, 68, 0.24)', color: 'rgba(254, 226, 226, 0.95)' }}>
+                {error}
+              </div>
+            ) : datasets.length === 0 ? (
+              <div className="mt-6 rounded-[1.4rem] border border-dashed px-6 py-14 text-center" style={{ borderColor: 'rgba(148, 163, 184, 0.24)' }}>
+                <div className="text-sm uppercase tracking-[0.18em] text-[color:var(--muted-2)]">No recent activity</div>
+                <p className="mx-auto mt-3 max-w-sm text-sm leading-6 text-[color:var(--muted)]">
+                  Start by uploading a dataset. Once you run cleaning or insight actions, this area becomes a quick project pulse.
+                </p>
+              </div>
+            ) : (
+              <div className="mt-6 space-y-5">
+                {datasets.map((dataset) => (
+                  <div
+                    key={dataset.dataset_id}
+                    className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b pb-5 last:border-0 last:pb-0"
+                    style={{ borderColor: 'var(--border)' }}
+                  >
+                    <div className="min-w-0">
+                      <div className="text-base font-semibold truncate text-[color:var(--text)]">{dataset.file_name}</div>
+                      <div className="mt-[2px] text-sm text-[color:var(--muted)] truncate">
+                        ID: {dataset.dataset_id} &bull; {dataset.rows} rows &bull; {dataset.columns} cols
+                      </div>
+                    </div>
+                    <Link to="/clean" className="dc-btn-secondary text-sm px-4 py-2 shrink-0 whitespace-nowrap">
+                      Open in cleaning
+                    </Link>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </section>
       </div>
